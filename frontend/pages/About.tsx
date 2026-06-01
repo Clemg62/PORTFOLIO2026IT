@@ -210,7 +210,7 @@ export const About: React.FC = () => {
           <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8 md:p-12 shadow-xl border border-indigo-100 flex flex-col md:flex-row items-center gap-10">
             <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0 rounded-full overflow-hidden border-8 border-white shadow-2xl">
               <img
-                src="../public/images/profil.png" 
+                src="/profil.png" 
                 alt="Clément Gosse"
                 className="w-full h-full object-cover"
               />

@@ -21,7 +21,7 @@ export const Home = () => {
           {/* TA PHOTO DE PROFIL ICI */}
           <div className="mb-8 flex justify-center">
             <img 
-              src="../public/images/profil.png" 
+              src="/profil.png" 
               alt="Clément Gosse" 
               className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full border-4 border-indigo-400/30 shadow-2xl"
             />
