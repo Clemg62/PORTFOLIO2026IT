@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, User as UserIcon, LogOut } from 'lucide-react';
-import { APP_NAME, NAV_ITEMS } from '../constants';
+import { Menu, X } from 'lucide-react';
 import { Button } from './Button';
-import { useAuth } from '../context/AuthContext';
+
+// Liste des liens de navigation mise à jour pour ton portfolio
+const NAV_ITEMS = [
+  { path: '/', label: 'Accueil' },
+  { path: '/portfolio', label: 'Projets' },
+  { path: '/about', label: 'Parcours' },
+  { path: '/dashboard', label: 'Démo Technique' }
+];
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           
-          {/* Logo */}
+          {/* Logo / Nom */}
           <div className="flex-shrink-0 flex items-center cursor-pointer" onClick={() => navigate('/')}>
-            <img
-              src="/logo.png"
-              alt="Hélia"
-              className="h-10 w-auto"
-              />
+            <span className="font-bold text-2xl text-indigo-600 tracking-tight">Clément<span className="text-gray-900">.</span></span>
           </div>
 
           {/* Desktop Menu */}
@@ -31,41 +32,25 @@ export const Navbar: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 end={item.path === '/'}
-                className={({ isActive }) => `text-sm font-medium transition-colors duration-200 text-gray-600 hover:text-helia-purple ${isActive ? '!text-helia-magenta !font-bold' : ''}`}
+                className={({ isActive }) => `text-sm font-medium transition-colors duration-200 text-gray-600 hover:text-indigo-600 ${isActive ? '!text-indigo-600 !font-bold' : ''}`}
               >
                 {item.label}
               </NavLink>
             ))}
           </div>
 
-          {/* CTA & Account */}
+          {/* CTA Contact */}
           <div className="hidden md:flex items-center space-x-4">
-            {isAuthenticated ? (
-              <>
-                 <span className="text-sm font-medium text-gray-700">Hello, {user?.firstName}</span>
-                 <Button variant="primary" size="sm" onClick={() => navigate('/dashboard')}>
-                    Mon Espace
-                 </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="secondary" size="sm" onClick={() => navigate('/login')}>
-                  <UserIcon className="w-4 h-4 mr-2" />
-                  Connexion
-                </Button>
-                <Button variant="primary" size="sm" onClick={() => navigate('/register')}>
-                  S'inscrire
-                </Button>
-              </>
-            )}
+            <Button variant="primary" size="sm" onClick={() => navigate('/contact')}>
+              Me contacter
+            </Button>
           </div>
 
           {/* Mobile menu button */}
           <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-600 hover:text-helia-purple focus:outline-none"
-              aria-label="Toggle menu"
+              className="text-gray-600 hover:text-indigo-600 focus:outline-none"
             >
               {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
@@ -83,32 +68,15 @@ export const Navbar: React.FC = () => {
                 to={item.path}
                 end={item.path === '/'}
                 onClick={() => setIsOpen(false)}
-                className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 ${isActive ? 'bg-helia-orange/10 text-helia-purple' : ''}`}
+                className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 ${isActive ? 'bg-indigo-50 text-indigo-600' : ''}`}
               >
                 {item.label}
               </NavLink>
             ))}
             <div className="pt-4 space-y-2">
-              {isAuthenticated ? (
-                 <>
-                  <Button className="w-full justify-center mb-2" variant="primary" onClick={() => { navigate('/dashboard'); setIsOpen(false); }}>
-                    Mon Espace
-                  </Button>
-                  <Button className="w-full justify-center" variant="secondary" onClick={() => { logout(); setIsOpen(false); }}>
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Déconnexion
-                  </Button>
-                 </>
-              ) : (
-                <>
-                  <Button className="w-full justify-center" variant="secondary" onClick={() => { navigate('/login'); setIsOpen(false); }}>
-                    Connexion
-                  </Button>
-                  <Button className="w-full justify-center" variant="primary" onClick={() => { navigate('/register'); setIsOpen(false); }}>
-                    Commencer
-                  </Button>
-                </>
-              )}
+              <Button className="w-full justify-center" variant="primary" onClick={() => { navigate('/contact'); setIsOpen(false); }}>
+                Me contacter
+              </Button>
             </div>
           </div>
         </div>

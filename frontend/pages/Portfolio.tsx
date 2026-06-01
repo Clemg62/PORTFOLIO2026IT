@@ -1,144 +1,163 @@
-import React, { useRef, useState } from 'react';
-import { Play, Film, X } from 'lucide-react';
+import React from 'react';
+import { Briefcase, Code, Terminal, Database, Server, Layout, FileText, CheckCircle2 } from 'lucide-react';
 
-// --- CONFIGURATION DE TES PROJETS ---
-// Remplace les IDs YouTube et les noms de fichiers par les tiens
+// --- DONNÉES DES PROJETS ---
 const PROJECTS = [
   {
     id: 1,
-    title: "Mariage de Christophe et Peggy",
-    category: "Mariage",
-    description: "Film complet retraçant cette journée magique.",
-    videoUrl: "/videos/mariage_chris.mp4", // Ton extrait de 15s dans public/videos/
-    thumbnail: "/images/minia_mariage.png", // Ta photo dans public/images/
-    youtubeId: "X2pQgm1iuf4" // L'ID de ta vidéo YouTube (même non répertoriée)
+    title: "Hélia - Assistant Virtuel",
+    category: "Web & PWA",
+    description: "Développement d'un assistant virtuel intelligent sous forme de Progressive Web App (PWA). Gestion des états complexes et interface utilisateur optimisée.",
+    tech: ["React", "Vite", "Tailwind CSS", "Service Workers"],
+    icon: <Layout className="w-6 h-6 text-indigo-500" />
   },
   {
     id: 2,
-    title: "Présentation drone",
-    category: "Événementiel",
-    description: "Plan drone et montage dynamique. Prises de vues drone et immersion totale.",
-    videoUrl: "/videos/drone_video.mp4",
-    thumbnail: "/images/minia_drone.png",
-    youtubeId: "UV1yIX4NW1I"
+    title: "Projet Quixo",
+    category: "Algorithmique & Logique",
+    description: "Développement d'un jeu de plateau stratégique où le but est d'aligner plusieurs murs en poussant les cases du plateau. Implémentation de la logique de jeu.",
+    tech: ["C", "Python", "Logique algorithmique"],
+    icon: <Terminal className="w-6 h-6 text-emerald-500" />
+  },
+  {
+    id: 3,
+    title: "Rise & Fall",
+    category: "Jeu Multijoueur & BDD",
+    description: "Jeu de tour par tour (15 min/tour) inspiré de Daifen. Jouable de 5 à 30 joueurs simultanément. Gestion des données des joueurs et de l'état du serveur.",
+    tech: ["Java", "SQL", "Yaml", "Architecture Client/Serveur"],
+    icon: <Database className="w-6 h-6 text-orange-500" />
+  }
+];
+
+// --- DONNÉES DE L'EXPÉRIENCE ---
+const EXPERIENCES = [
+  {
+    id: 1,
+    period: "2024 - 2026",
+    role: "Alternance Informatique",
+    company: "Les Prairies de la Mer",
+    description: "Application pratique des compétences de développement et gestion du parc/système informatique en milieu professionnel.",
+    isTech: true
+  },
+  {
+    id: 2,
+    period: "2022 - 2026",
+    role: "Vidéaste / Content Creator",
+    company: "Académie de Football & Clubs sportifs",
+    description: "Production, tournage (caméra, drone) et montage (Motion Design). Démontre une forte créativité, maîtrise des outils digitaux et autonomie.",
+    isTech: false
+  },
+  {
+    id: 3,
+    period: "Juillet - Août 2023",
+    role: "Employé Polyvalent",
+    company: "Supérette Vival",
+    description: "Gestion des stocks, encaissement, relation client. Développement de l'adaptabilité et du sens des responsabilités.",
+    isTech: false
+  },
+  {
+    id: 4,
+    period: "Mai 2022",
+    role: "Stage d'observation",
+    company: "BNP Paribas (Mougins)",
+    description: "Découverte du monde de l'entreprise et du secteur bancaire.",
+    isTech: false
   }
 ];
 
 export const Portfolio: React.FC = () => {
-  const [selectedYoutubeId, setSelectedYoutubeId] = useState<string | null>(null);
-
   return (
-    <div className="bg-gray-900 min-h-screen py-24 px-4 sm:px-6 lg:px-8">
-      {/* En-tête */}
-      <div className="max-w-7xl mx-auto mb-20 text-center">
-        <div className="inline-flex items-center justify-center p-3 bg-indigo-500/10 rounded-full mb-6">
-          <Film className="w-6 h-6 text-indigo-400 mr-2" />
-          <span className="text-indigo-200 font-semibold uppercase tracking-wider text-sm">Réalisations</span>
+    <div className="bg-gray-50 min-h-screen py-24 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* EN-TÊTE */}
+        <div className="mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
+            Mes Projets & Expériences
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl leading-relaxed">
+            Un aperçu de mes réalisations académiques en développement et de mon parcours professionnel.
+          </p>
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
-          Mon Portfolio
-        </h1>
-        <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-          Survolez pour un aperçu, <strong>cliquez pour visionner le projet complet</strong>.
-        </p>
-      </div>
 
-      {/* Grille de projets (2 colonnes sur PC) */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
-        {PROJECTS.map((project) => (
-          <VideoCard 
-            key={project.id} 
-            project={project} 
-            onClick={() => setSelectedYoutubeId(project.youtubeId)} 
-          />
-        ))}
-      </div>
-
-      {/* --- FENÊTRE POPUP (MODALE) YOUTUBE --- */}
-      {selectedYoutubeId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
-          <button 
-            onClick={() => setSelectedYoutubeId(null)}
-            className="absolute top-6 right-6 text-white hover:text-indigo-400 transition-colors"
-          >
-            <X size={48} />
-          </button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
-          <div className="w-full max-w-5xl aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-            <iframe
-              width="100%"
-              height="100%"
-              src={`https://www.youtube.com/embed/${selectedYoutubeId}?autoplay=1`}
-              title="Lecteur Vidéo"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+          {/* COLONNE GAUCHE : PROJETS (Prend 2 colonnes sur grand écran) */}
+          <div className="lg:col-span-2 space-y-8">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center border-b border-gray-200 pb-4">
+              <Code className="w-6 h-6 mr-3 text-indigo-600" />
+              Projets Académiques (SAÉ)
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {PROJECTS.map((project) => (
+                <div key={project.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 bg-gray-50 rounded-xl">
+                      {project.icon}
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                      {project.category}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                  <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                    {project.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-auto">
+                    {project.tech.map((t, idx) => (
+                      <span key={idx} className="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-lg">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* SOFTSKILLS (Inspiré de ta capture d'écran) */}
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center border-b border-gray-200 pb-4 mt-16">
+              <FileText className="w-6 h-6 mr-3 text-indigo-600" />
+              Soft Skills
+            </h2>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-wrap gap-4">
+              {['Créativité', 'Rigueur', 'Autonomie', 'Esprit d\'analyse', 'Adaptabilité', 'Travail en équipe'].map((skill, index) => (
+                <div key={index} className="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-100">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mr-2" />
+                  <span className="text-gray-700 font-medium">{skill}</span>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* COLONNE DROITE : EXPÉRIENCE PRO (Timeline) */}
+          <div className="lg:col-span-1">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center border-b border-gray-200 pb-4 mb-8">
+              <Briefcase className="w-6 h-6 mr-3 text-indigo-600" />
+              Parcours Pro
+            </h2>
+
+            <div className="space-y-8 relative before:absolute before:inset-0 before:ml-2 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
+              {EXPERIENCES.map((exp) => (
+                <div key={exp.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                  <div className="flex items-center justify-center w-6 h-6 rounded-full border-4 border-white bg-indigo-100 text-indigo-600 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10">
+                    <div className={`w-2 h-2 rounded-full ${exp.isTech ? 'bg-indigo-600' : 'bg-gray-400'}`}></div>
+                  </div>
+                  <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-white shadow-sm border border-gray-100">
+                    <div className="flex items-center justify-between mb-1">
+                      <h4 className="font-bold text-gray-900 text-sm">{exp.role}</h4>
+                    </div>
+                    <div className="text-indigo-600 font-medium text-xs mb-2">{exp.company}</div>
+                    <time className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">{exp.period}</time>
+                    <p className="text-xs text-gray-600 leading-relaxed">{exp.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
-      )}
-    </div>
-  );
-};
-
-// --- COMPOSANT INTERNE : CARTE VIDÉO ---
-const VideoCard = ({ project, onClick }: { project: any, onClick: () => void }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    videoRef.current?.play().catch(() => {});
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  };
-
-  return (
-    <div 
-      className="group relative rounded-2xl overflow-hidden cursor-pointer shadow-2xl h-[450px] bg-black border border-gray-800 transition-all hover:border-indigo-500/50"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-    >
-      {/* Média (Image ou Vidéo) */}
-      <div className="absolute inset-0 w-full h-full transform transition-transform duration-700 group-hover:scale-105">
-        <img 
-          src={project.thumbnail} 
-          alt={project.title}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isHovered ? 'opacity-0' : 'opacity-100'}`}
-        />
-        <video
-          ref={videoRef}
-          src={project.videoUrl}
-          muted loop playsInline
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
       </div>
-
-      {/* Infos du projet */}
-      <div className="absolute bottom-0 left-0 w-full p-8 z-10">
-        <span className="inline-block px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded-full mb-3 uppercase">
-          {project.category}
-        </span>
-        <h3 className="text-3xl font-bold text-white mb-2">{project.title}</h3>
-        <p className="text-gray-300 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-          {project.description}
-        </p>
-      </div>
-
-      {/* Icône Play centrale */}
-      {!isHovered && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md p-6 rounded-full border border-white/20">
-          <Play className="w-8 h-8 text-white fill-white" />
-        </div>
-      )}
     </div>
   );
 };

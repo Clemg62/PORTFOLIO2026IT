@@ -25,25 +25,25 @@ export const PrivacyPolicy: React.FC = () => {
             <div>
               <h2 className="text-2xl font-bold text-indigo-700 mb-3">Introduction</h2>
               <p className="text-gray-700 leading-relaxed">
-                En tant que vidéaste et créateur indépendant, la confidentialité de vos données est essentielle pour moi. Je m'engage à respecter votre vie privée et à protéger les informations que vous me confiez. Cette politique explique en détail quelles données sont collectées via ce site web, comment elles sont utilisées, et les mesures prises pour garantir leur sécurité.
+                En tant que développeur web et étudiant, la confidentialité de vos données est essentielle pour moi. Je m'engage à respecter votre vie privée et à protéger les informations que vous me confiez. Cette politique explique en détail quelles données sont collectées via ce site web, comment elles sont utilisées, et les mesures prises pour garantir leur sécurité.
               </p>
             </div>
             <div>
               <h2 className="text-2xl font-bold text-indigo-700 mb-3">Données collectées</h2>
               <p className="text-gray-700 leading-relaxed">
-                Je collecte uniquement les informations nécessaires pour répondre à vos demandes de devis ou de contact : nom, prénom, adresse email, numéro de téléphone, et les détails de votre projet vidéo. Des données de navigation anonymisées (via les cookies) peuvent également être recueillies pour analyser le trafic du site et améliorer votre expérience de navigation.
+                Je collecte uniquement les informations nécessaires pour répondre à vos demandes de contact ou de recrutement : nom, prénom, adresse email, entreprise, et les détails de votre projet web ou offre de stage/alternance. Des données de navigation anonymisées (via les cookies) peuvent également être recueillies pour analyser le trafic du site.
               </p>
             </div>
             <div>
               <h2 className="text-2xl font-bold text-indigo-700 mb-3">Utilisation des données</h2>
               <p className="text-gray-700 leading-relaxed">
-                Vos données me permettent exclusivement de communiquer avec vous concernant vos projets, d'établir des devis, de gérer la facturation, et de répondre à vos messages envoyés depuis le formulaire de contact. Aucune de vos données n'est utilisée à des fins commerciales de prospection de masse sans votre consentement explicite.
+                Vos données me permettent exclusivement de communiquer avec vous concernant des opportunités professionnelles, d'établir des devis pour des projets web, et de répondre à vos messages envoyés depuis le formulaire de contact. Aucune de vos données n'est utilisée à des fins commerciales de prospection.
               </p>
             </div>
             <div>
               <h2 className="text-2xl font-bold text-indigo-700 mb-3">Partage des données</h2>
               <p className="text-gray-700 leading-relaxed">
-                Vos informations personnelles ne sont jamais vendues, louées ou partagées avec des tiers. Elles restent strictement confidentielles et ne sont accessibles que par moi-même, dans le cadre de notre relation professionnelle. Les seuls cas de partage concernent des nécessités techniques (par exemple, le service d'envoi d'emails sécurisé) ou d'éventuelles obligations légales.
+                Vos informations personnelles ne sont jamais vendues, louées ou partagées avec des tiers. Elles restent strictement confidentielles et ne sont accessibles que par moi-même. Les seuls cas de partage concernent des nécessités techniques (par exemple, le service d'envoi d'emails sécurisé EmailJS).
               </p>
             </div>
             <div>
@@ -55,7 +55,7 @@ export const PrivacyPolicy: React.FC = () => {
             <div>
               <h2 className="text-2xl font-bold text-indigo-700 mb-3">Vos droits</h2>
               <p className="text-gray-700 leading-relaxed">
-                Conformément à la réglementation (RGPD), vous pouvez à tout moment accéder à vos données, demander leur rectification ou leur suppression. Pour exercer vos droits, il vous suffit de me contacter directement à : <a href="mailto:contact@ton-domaine.fr" className="text-indigo-600 font-semibold hover:underline">contact@ton-domaine.fr</a>. Je m'engage à traiter votre demande dans les meilleurs délais.
+                Conformément à la réglementation (RGPD), vous pouvez à tout moment accéder à vos données, demander leur rectification ou leur suppression. Pour exercer vos droits, il vous suffit de me contacter directement à : <a href="mailto:clementgosse83@gmail.com" className="text-indigo-600 font-semibold hover:underline">clementgosse83@gmail.com</a>.
               </p>
             </div>
           </div>
@@ -67,9 +67,9 @@ export const PrivacyPolicy: React.FC = () => {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-10 md:p-16 shadow-2xl relative overflow-hidden">
             <div className="relative z-10">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Votre confiance est précieuse</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">La sécurité au cœur du code</h2>
               <p className="text-indigo-200 mb-8">
-                L'intégrité de vos données est assurée, de la prise de contact jusqu'à la livraison finale de votre vidéo.
+                L'intégrité de vos données est assurée, de la prise de contact jusqu'à la mise en production de votre projet.
               </p>
               <Button 
                 className="bg-indigo-600 text-white hover:bg-indigo-500 px-8 py-3 rounded-lg font-bold transition-colors" 

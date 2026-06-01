@@ -1,191 +1,107 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/Button';
-import { User, Calendar, Settings, LogOut, Bell, BellRing, BellOff, Edit2, Check, X, Ban } from 'lucide-react';
-import { subscriptionService } from '../services/subscription.service';
-import { authService } from '../services/auth.service';
-import { useNavigate } from 'react-router-dom';
+import { User, Database, Code, BellRing, BellOff, Edit2, Check, X } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
-  const { user, token, logout } = useAuth(); // Note: useAuth provides login/logout/register but does not expose 'setUser' directly for updates, so we might need to rely on re-fetching or refreshing the page if we don't update context.
-  // Ideally AuthContext should expose a method to update local user state, but we'll fetch from API for now or reload.
+  // Fausses données pour la démo technique
+  const [user, setUser] = useState({ firstName: 'Clément', lastName: 'Gosse', email: 'clementgosse83@gmail.com' });
   
-  const navigate = useNavigate();
-  const [subscription, setSubscription] = useState<any | null>(null);
-  const [loadingSub, setLoadingSub] = useState(true);
-  
-  // Notification State
+  // États de l'interface
   const [notifEnabled, setNotifEnabled] = useState(false);
-
-  // Profile Edit State
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ firstName: '', lastName: '' });
+  const [editForm, setEditForm] = useState({ firstName: user.firstName, lastName: user.lastName });
   const [savingProfile, setSavingProfile] = useState(false);
 
-  // Cancellation State
-  const [cancelling, setCancelling] = useState(false);
-
   useEffect(() => {
-    const fetchSub = async () => {
-        if (token) {
-            const sub = await subscriptionService.getCurrentSubscription(token);
-            setSubscription(sub);
-        }
-        setLoadingSub(false);
-    };
-
-    // Initialize Notification State based on localStorage AND Browser Permission
+    // Vérifier si le navigateur autorise les notifications
     const checkNotifStatus = () => {
         const storedPref = localStorage.getItem('helia_notifications_enabled') === 'true';
         const permissionGranted = 'Notification' in window && Notification.permission === 'granted';
         setNotifEnabled(storedPref && permissionGranted);
     };
-
-    if (user) {
-        setEditForm({ firstName: user.firstName, lastName: user.lastName });
-    }
-
-    fetchSub();
     checkNotifStatus();
-  }, [token, user]);
+  }, []);
 
   const toggleNotifications = async () => {
     if (!('Notification' in window)) {
         alert("Votre navigateur ne supporte pas les notifications.");
         return;
     }
-
     if (notifEnabled) {
-        // Disable
         setNotifEnabled(false);
         localStorage.setItem('helia_notifications_enabled', 'false');
     } else {
-        // Enable
         if (Notification.permission === 'granted') {
             setNotifEnabled(true);
             localStorage.setItem('helia_notifications_enabled', 'true');
-            new Notification('Notifications activées', {
-                body: 'Vous recevrez désormais des alertes pour votre abonnement.',
-                icon: '/vite.svg'
+            new Notification('PWA : Notifications activées', {
+                body: 'Démonstration du Service Worker réussie.',
             });
         } else if (Notification.permission !== 'denied') {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
                 setNotifEnabled(true);
                 localStorage.setItem('helia_notifications_enabled', 'true');
-                new Notification('Notifications activées', {
-                    body: 'Vous recevrez désormais des alertes pour votre abonnement.',
-                    icon: '/vite.svg'
+                new Notification('PWA : Notifications activées', {
+                    body: 'Démonstration du Service Worker réussie.',
                 });
             }
-        } else {
-            alert("Les notifications sont bloquées dans votre navigateur. Veuillez les autoriser dans les paramètres du site.");
         }
     }
   };
 
-  const handleSaveProfile = async () => {
-    if (!token || !user) return;
+  const handleSaveProfile = () => {
     setSavingProfile(true);
-    try {
-        await authService.updateProfile(user.id, token, editForm);
-        // Reload page to refresh context (since context doesn't expose setUser update easily in this simplified version)
-        window.location.reload(); 
-    } catch (error) {
-        alert("Erreur lors de la mise à jour");
+    // Simulation d'un appel API (chargement de 1 seconde)
+    setTimeout(() => {
+        setUser({ ...user, firstName: editForm.firstName, lastName: editForm.lastName });
+        setIsEditing(false);
         setSavingProfile(false);
-    }
+    }, 1000);
   };
 
-  const handleCancelSubscription = async () => {
-    if (!token || !subscription) return;
-    if (!window.confirm("Êtes-vous sûr de vouloir résilier votre abonnement ? Il s'arrêtera à la fin de la période en cours.")) return;
-
-    setCancelling(true);
-    try {
-        await subscriptionService.cancelSubscription(token);
-        // Refresh sub data
-        const sub = await subscriptionService.getCurrentSubscription(token);
-        setSubscription(sub);
-        alert("Abonnement résilié avec succès.");
-    } catch (error) {
-        alert("Erreur lors de la résiliation");
-    } finally {
-        setCancelling(false);
-    }
-  };
-
-  const simulateSubscriptionEnd = () => {
-    if (!subscription) {
-        alert("Aucun abonnement actif.");
-        return;
-    }
-
+  const simulatePushEvent = () => {
     if (notifEnabled && Notification.permission === 'granted') {
-        // Simulate a backend push event via local SW
-        if ('serviceWorker' in navigator) {
-             navigator.serviceWorker.ready.then(registration => {
-                registration.showNotification('Attention : Fin d\'abonnement', {
-                    body: 'Votre période d\'essai se termine dans 24h. Pensez à renouveler.',
-                    icon: '/vite.svg',
-                    tag: 'subscription-end',
-                    requireInteraction: true
-                });
-            });
-        } else {
-            // Fallback if SW not ready
-            new Notification('Attention : Fin d\'abonnement', {
-                body: 'Votre période d\'essai se termine dans 24h. Pensez à renouveler.',
-                icon: '/vite.svg'
-            });
-        }
+        new Notification('Événement React', {
+            body: 'Ceci est une simulation de push notification locale.',
+        });
     } else {
-        alert("Veuillez d'abord activer les notifications via le bouton (cloche ou paramètres).");
+        alert("Veuillez d'abord activer les notifications (démo PWA) via le bouton Système.");
     }
   };
-
-  // Check if plan is free (mock ID 1 or price 0)
-  const isFreePlan = subscription?.plan?.price === 0 || subscription?.plan?.priceCents === 0;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
+        {/* En-tête de la démo */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div>
+            <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold mb-2 uppercase tracking-wide">
+              Espace de Démonstration (Projet Hélia)
+            </span>
             <h1 className="text-3xl font-serif font-bold text-gray-900">
-              Bonjour, {user?.firstName} !
+              Session Développeur
             </h1>
-            <p className="text-gray-600">Bienvenue sur votre espace personnel Hélia.</p>
-          </div>
-          <div className="flex gap-4 mt-4 md:mt-0">
-             <Button variant="secondary" onClick={toggleNotifications} title={notifEnabled ? "Désactiver les notifications" : "Activer les notifications"}>
-                {notifEnabled ? <BellRing size={18} className="text-helia-purple"/> : <BellOff size={18} className="text-gray-400" />}
-             </Button>
-            <Button variant="outline" className="!text-helia-purple !border-helia-purple hover:!bg-helia-purple hover:!text-white" onClick={logout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Déconnexion
-            </Button>
+            <p className="text-gray-600">Démonstration technique des états React et des fonctionnalités web.</p>
           </div>
         </div>
 
-        {/* Dashboard Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
-          {/* Profile Card */}
+          {/* Carte 1 : Profil & État React */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
             <div className="flex items-center justify-between mb-4">
                <div className="flex items-center">
-                    <div className="p-3 bg-helia-orange/10 rounded-full text-helia-orange mr-4">
+                    <div className="p-3 bg-blue-50 rounded-full text-blue-600 mr-4">
                         <User size={24} />
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900">Mon Profil</h2>
+                    <h2 className="text-xl font-bold text-gray-900">État Utilisateur</h2>
                </div>
                <button 
                 onClick={() => setIsEditing(!isEditing)}
-                className="text-gray-400 hover:text-helia-purple transition-colors"
-                title="Modifier"
+                className="text-gray-400 hover:text-indigo-600 transition-colors"
+                title="Tester le setState"
                >
                  {isEditing ? <X size={20} /> : <Edit2 size={20} />}
                </button>
@@ -193,142 +109,107 @@ export const Dashboard: React.FC = () => {
             
             <div className="space-y-3">
               <div className="border-b border-gray-50 pb-2">
-                <span className="text-gray-500 text-sm block mb-1">Nom complet</span>
+                <span className="text-gray-500 text-sm block mb-1">Nom complet (State local)</span>
                 {isEditing ? (
                     <div className="flex gap-2">
                         <input 
                             type="text" 
-                            className="w-1/2 p-1 border rounded text-sm"
+                            className="w-1/2 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                             value={editForm.firstName}
                             onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
                         />
                         <input 
                             type="text" 
-                            className="w-1/2 p-1 border rounded text-sm"
+                            className="w-1/2 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                             value={editForm.lastName}
                             onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
                         />
                     </div>
                 ) : (
-                    <span className="font-medium">{user?.firstName} {user?.lastName}</span>
+                    <span className="font-medium text-gray-900">{user.firstName} {user.lastName}</span>
                 )}
               </div>
               
               <div className="flex justify-between border-b border-gray-50 pb-2">
                 <span className="text-gray-500">Email</span>
-                <span className="font-medium">{user?.email}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Membre depuis</span>
-                <span className="font-medium">
-                  {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
-                </span>
+                <span className="font-medium text-gray-900">{user.email}</span>
               </div>
 
               {isEditing && (
                   <Button 
                     size="sm" 
-                    className="w-full mt-2" 
+                    className="w-full mt-4" 
                     onClick={handleSaveProfile}
                     disabled={savingProfile}
                   >
-                    {savingProfile ? 'Enregistrement...' : 'Enregistrer'}
+                    {savingProfile ? 'Mise à jour du State...' : 'Valider la modification'}
                   </Button>
               )}
             </div>
           </div>
 
-          {/* Subscription Card */}
+          {/* Carte 2 : Simulation API */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
              <div className="flex items-center mb-4">
-              <div className="p-3 bg-helia-purple/10 rounded-full text-helia-purple mr-4">
-                <Calendar size={24} />
+              <div className="p-3 bg-indigo-50 rounded-full text-indigo-600 mr-4">
+                <Database size={24} />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Mon Abonnement</h2>
+              <h2 className="text-xl font-bold text-gray-900">Données Mockées</h2>
             </div>
             <div className="py-2">
-              {loadingSub ? (
-                 <p className="text-gray-400">Chargement...</p>
-              ) : subscription ? (
                  <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold text-helia-purple">{subscription.plan?.name}</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${subscription.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                            {subscription.status}
+                        <span className="text-sm font-bold text-indigo-600">Connexion Serveur</span>
+                        <span className="px-2 py-1 rounded-full text-xs font-bold uppercase bg-green-100 text-green-700 flex items-center">
+                            <Check size={12} className="mr-1"/> Simulé
                         </span>
                     </div>
-                    <div className="text-sm text-gray-600 space-y-1">
-                        <p>Début : {new Date(subscription.currentPeriodStart).toLocaleDateString()}</p>
-                        <p>Fin : {new Date(subscription.currentPeriodEnd).toLocaleDateString()}</p>
-                        {subscription.cancelAtPeriodEnd ? (
-                            <p className="text-xs text-red-500 mt-2 font-semibold">Resiliation programmée à la fin de la période.</p>
-                        ) : (
-                            <p className="text-xs text-gray-400 mt-2">Renouvellement automatique actif</p>
-                        )}
+                    <div className="text-sm text-gray-600 space-y-1 bg-gray-50 p-4 rounded-lg font-mono text-xs border border-gray-100">
+                        <p className="text-green-600">{"// JSON Response"}</p>
+                        <p>{"{"}</p>
+                        <p className="pl-4">"status": <span className="text-blue-600">"active"</span>,</p>
+                        <p className="pl-4">"role": <span className="text-blue-600">"admin"</span>,</p>
+                        <p className="pl-4">"token": <span className="text-blue-600">"eyJhbGciOiJIUzI1..."</span></p>
+                        <p>{"}"}</p>
                     </div>
-                    
-                    {subscription.status === 'active' && !subscription.cancelAtPeriodEnd && !isFreePlan && (
-                        <button 
-                            onClick={handleCancelSubscription}
-                            disabled={cancelling}
-                            className="w-full mt-4 py-2 border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50 transition-colors flex items-center justify-center"
-                        >
-                            <Ban size={16} className="mr-2" />
-                            {cancelling ? 'Traitement...' : 'Résilier l\'abonnement'}
-                        </button>
-                    )}
-                    {isFreePlan && (
-                        <p className="text-xs text-gray-400 italic mt-4 text-center">
-                            L'offre gratuite prend fin automatiquement.
-                        </p>
-                    )}
-
-                     {/* Demo Button for PWA */}
                      <button 
-                        onClick={simulateSubscriptionEnd}
-                        className="w-full text-xs text-center text-helia-orange underline mt-4 hover:text-helia-coral"
+                        onClick={simulatePushEvent}
+                        className="w-full text-xs text-center text-indigo-600 font-semibold border border-indigo-200 py-2.5 rounded-lg mt-4 hover:bg-indigo-50 transition-colors"
                      >
-                        (Demo) Simuler alerte fin
+                        Tester une Notification Web
                      </button>
                  </div>
-              ) : (
-                <div className="text-center py-4">
-                    <p className="text-gray-500 mb-4">Vous n'avez pas encore d'abonnement actif.</p>
-                    <Button size="sm" variant="primary" onClick={() => navigate('/pricing')}>Découvrir les offres</Button>
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Actions */}
+          {/* Carte 3 : Système */}
            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
              <div className="flex items-center mb-4">
               <div className="p-3 bg-gray-100 rounded-full text-gray-600 mr-4">
-                <Settings size={24} />
+                <Code size={24} />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Paramètres</h2>
+              <h2 className="text-xl font-bold text-gray-900">Système</h2>
             </div>
-            <ul className="space-y-3">
-              <li>
-                <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-50 text-gray-700 transition-colors">
-                  Gérer ma famille
-                </button>
-              </li>
+            <ul className="space-y-3 mt-6">
               <li>
                 <button 
                   onClick={toggleNotifications}
-                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-50 text-gray-700 transition-colors flex justify-between items-center"
+                  className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 text-gray-700 transition-colors flex justify-between items-center border border-gray-100"
                 >
-                  <span>Notifications</span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${notifEnabled ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'}`}>
-                    {notifEnabled ? 'Activées' : 'Désactivées'}
+                  <span className="flex items-center font-medium">
+                    {notifEnabled ? <BellRing size={16} className="mr-2 text-indigo-600"/> : <BellOff size={16} className="mr-2 text-gray-400"/>}
+                    API Notifications
+                  </span>
+                  <span className={`text-xs px-2.5 py-1 rounded-full font-bold ${notifEnabled ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500'}`}>
+                    {notifEnabled ? 'Activé' : 'Désactivé'}
                   </span>
                 </button>
               </li>
               <li>
-                 <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-50 text-red-600 transition-colors">
-                  Supprimer mon compte
-                </button>
+                <div className="w-full text-left px-4 py-3 rounded-xl text-gray-700 flex justify-between items-center border border-gray-100 bg-gray-50">
+                  <span className="font-medium">Stockage Local (Storage)</span>
+                  <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-green-100 text-green-700">Actif</span>
+                </div>
               </li>
             </ul>
           </div>

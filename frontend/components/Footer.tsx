@@ -10,50 +10,45 @@ export const Footer: React.FC = () => {
           
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <img 
-                src="/logo.png" 
-                alt="Logo Hélia" 
-                className="w-8 h-autpo"
-              />
-              <h3 className="font-serif text-2xl font-bold text-helia-purple">Hélia</h3>
+              <h3 className="font-serif text-2xl font-bold text-indigo-600">Clément Gosse</h3>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed">
-              Le lien numérique qui réunit les familles, simplifie le quotidien des seniors et rassure les proches.
+              Étudiant en BUT Informatique. Passionné par le développement web, l'écosystème React et la création d'interfaces modernes.
             </p>
           </div>
 
           <div>
             <h4 className="font-bold text-gray-900 mb-4">Navigation</h4>
             <ul className="space-y-2 text-sm text-gray-600">
-              <li><Link to="/" className="hover:text-helia-coral">Accueil</Link></li>
-              <li><Link to="/pricing" className="hover:text-helia-coral">Nos Offres</Link></li>
-              <li><Link to="/about" className="hover:text-helia-coral">À propos</Link></li>
+              <li><Link to="/" className="hover:text-indigo-600">Accueil</Link></li>
+              <li><Link to="/portfolio" className="hover:text-indigo-600">Projets & Expériences</Link></li>
+              <li><Link to="/about" className="hover:text-indigo-600">À propos</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-bold text-gray-900 mb-4">Légal</h4>
             <ul className="space-y-2 text-sm text-gray-600">
-              <li><Link to="/legal" className="hover:text-helia-coral">Mentions Légales</Link></li>
-              <li><Link to="/privacy" className="hover:text-helia-coral">Politique de Confidentialité</Link></li>
-              <li><Link to="/cookies" className="hover:text-helia-coral">Gestion des cookies</Link></li>
+              <li><Link to="/legal" className="hover:text-indigo-600">Mentions Légales</Link></li>
+              <li><Link to="/privacy" className="hover:text-indigo-600">Politique de Confidentialité</Link></li>
+              <li><Link to="/cookies" className="hover:text-indigo-600">Gestion des cookies</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-bold text-gray-900 mb-4">Contact</h4>
             <ul className="space-y-2 text-sm text-gray-600">
-              <li>contact@helia.fr</li>
-              <li>01 23 45 67 89</li>
-              <li>2000 Rte des Lucioles, Biot</li>
+              <li>clementgosse83@gmail.com</li>
+              <li>06 46 52 53 43</li>
+              <li>Côte d'Azur, France</li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-400">© {new Date().getFullYear()} Hélia. Tous droits réservés.</p>
+          <p className="text-sm text-gray-400">© {new Date().getFullYear()} Clément Gosse. Tous droits réservés.</p>
           <div className="flex items-center text-sm text-gray-400 mt-4 md:mt-0">
-            Fait avec <Heart size={16} className="text-helia-pink mx-1 fill-current" /> par les étudiants du BUT Info.
+            Codé avec <Heart size={16} className="text-indigo-500 mx-1 fill-current" /> en React.
           </div>
         </div>
       </div>
