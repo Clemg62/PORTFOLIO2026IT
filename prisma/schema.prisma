@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum TokenScope {
+  ACTIVATION     @map("ACTIVATION")
+  AUTHENTICATION @map("AUTHENTICATION")
+  PASSWORD_RESET @map("PASSWORD_RESET")
+}
+
+enum IntervalUnit {
+  day
+  week
+  month
+  year
+}
+
+enum SubscriptionEventType {
+  creation
+  renewal
+  upgrade
+  downgrade
+  cancellation
+  reactivation
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id        BigInt     @id @default(autoincrement()) @db.BigInt
+  firstName String     @map("first_name") @db.VarChar(100)
+  lastName  String     @map("last_name") @db.VarChar(100)
+  email     String     @unique(map: "email") @map("email") @db.VarChar(255)
+  password  String     @map("password") @db.VarChar(255)
+  createdAt DateTime   @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt DateTime   @default(now()) @updatedAt @map("updated_at") @db.DateTime(3)
+  deletedAt DateTime?  @map("deleted_at") @db.DateTime(3)
+
+  // Relations
+  token     Token[]
+  roles     UserRole[]
+  subscriptions Subscription[] @relation(map: "fk_sub_user")
+  subscriptionHistories SubscriptionHistory[] @relation(map: "fk_hist_user")
+  payments Payment[] @relation(map: "fk_payment_user")
+
+  @@map("users")
+}
+
+model Token {
+  id        BigInt     @id @default(autoincrement()) @db.BigInt
+  hash      Bytes      @unique(map: "hash") @db.Binary(32)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "fk_token_user")
+  userId    BigInt     @map("user_id") @db.BigInt
+  expiry    DateTime?  @db.DateTime(3)
+  scope     TokenScope
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  @@index([userId], map: "idx_token_user")
+  @@index([expiry], map: "idx_token_expiry")
+  @@map("tokens")
+}
+
+model Role {
+  id        Int        @id @default(autoincrement()) @db.Int
+  name      String     @unique(map: "roles_name_key") @map("name") @db.VarChar(100)
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  // Relations
+  users     UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  id        BigInt   @id @default(autoincrement()) @db.BigInt
+  userId    BigInt   @map("user_id") @db.BigInt
+  roleId    Int      @map("role_id") @db.Int
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "user_roles_user_id_fkey")
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "user_roles_role_id_fkey")
+
+  @@unique([userId, roleId], map: "user_roles_user_id_role_id_key")
+  @@map("user_roles")
+}
+
+model Contact {
+  id        BigInt   @id @default(autoincrement()) @db.BigInt
+  name      String   @map("name") @db.VarChar(100)
+  email     String   @map("email") @db.VarChar(255)
+  telephone String   @map("telephone") @db.VarChar(50)
+  subject   String   @map("subject") @db.VarChar(255)
+  message   String   @map("message") @db.Text
+  agreePolicy Boolean  @map("agree_policy")
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
+
+  @@map("contacts")
+}
+
+model Plan {
+  id            Int          @id @default(autoincrement()) @db.Int
+  name          String       @unique(map: "name") @map("name") @db.VarChar(50)
+  price         Int          @map("price") @db.Int
+  currency      String       @default("EUR") @map("currency") @db.VarChar(3)
+  intervalUnit  IntervalUnit @map("interval_unit")
+  intervalCount Int          @default(1) @map("interval_count") @db.Int
+  active        Boolean      @default(true) @map("active")
+  createdAt     DateTime     @default(now()) @map("created_at") @db.DateTime(3)
+
+  // Relations
+  subscriptions Subscription[] @relation(map: "fk_sub_plan")
+  subscriptionHistories SubscriptionHistory[] @relation(map: "fk_hist_plan")
+
+  @@map("plans")
+}
+
+model Subscription {
+  id BigInt @id @default(autoincrement())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "fk_sub_user")
+  userId BigInt @unique(map: "user_id") @map("user_id")
+  plan   Plan @relation(fields: [planId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "fk_sub_plan")
+  planId Int  @map("plan_id")
+  status String @db.VarChar(20)
+  currentPeriodStart DateTime  @map("current_period_start") @db.DateTime(0)
+  currentPeriodEnd   DateTime  @map("current_period_end") @db.DateTime(0)
+  trialEndsAt        DateTime? @map("trial_ends_at") @db.DateTime(0)
+  cancelAtPeriodEnd Boolean @default(false) @map("cancel_at_period_end")
+  autoRenew         Boolean @default(true) @map("auto_renew")
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.DateTime(0)
+  
+  // Relations
+  payments Payment[] @relation(map: "fk_payment_sub")
+
+  @@index([status], map: "idx_sub_status")
+  @@index([currentPeriodEnd], map: "idx_sub_end_date")
+  @@map("subscriptions")
+}
+
+model SubscriptionHistory {
+  id          BigInt                @id @default(autoincrement())
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "fk_hist_user")
+  userId      BigInt                @map("user_id")
+  plan        Plan                  @relation(fields: [planId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "fk_hist_plan")
+  planId      Int                   @map("plan_id")
+  amountPaid  Int                   @default(0) @map("amount_paid")
+  currency    String                @default("EUR") @db.VarChar(3)
+  periodStart DateTime              @map("period_start") @db.DateTime(0)
+  periodEnd   DateTime              @map("period_end") @db.DateTime(0)
+  status      String                @db.VarChar(20)
+  eventType   SubscriptionEventType @map("event_type")
+  createdAt   DateTime              @default(now()) @map("created_at") @db.DateTime(0)
+
+  @@map("subscription_history")
+}
+
+model Payment {
+  id                    BigInt         @id @default(autoincrement())
+  user                  User           @relation(fields: [userId], references: [id], map: "fk_payment_user")
+  userId                BigInt         @map("user_id")
+  subscription          Subscription?  @relation(fields: [subscriptionId], references: [id], map: "fk_payment_sub")
+  subscriptionId        BigInt?        @map("subscription_id")
+  amount                Int
+  currency              String         @default("EUR") @db.VarChar(3)
+  status                PaymentStatus  @default(PENDING)
+  provider              String         @default("FAKE") @db.VarChar(50)
+  providerTransactionId String?        @map("provider_transaction_id") @db.VarChar(255)
+  createdAt             DateTime       @default(now()) @map("created_at") @db.DateTime(3)
+
+  @@index([userId], map: "idx_payment_user")
+  @@index([status], map: "idx_payment_status")
+  @@map("payments")
+}
